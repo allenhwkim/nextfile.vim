@@ -1,10 +1,10 @@
 nextfile.vim
 ===============
 
-Vim script to open next file with \n, <leader>n
-You can switch between a class and the class test
+Vim script to open next file with `\n`, <leader>n
+You can switch between a class and the class test, and a model and model test, etc
 
-If you also set next file more than two files. In example,
+You also can set next file more than two files. In example,
 
     foo.js --> foo_test.js --> foo_controller.js 
      ^                                  |
