@@ -18,7 +18,7 @@ How it works
 * When initialized, set related file patterns by file type
   Please refer to the installation instruction
 
-* In vim window, when <leader>n is pressed
+* In vim window, when `\n`, which is `<leader>n`, is pressed
     * Get the current file name
     * Get the related file
     * If the current file is modified,
