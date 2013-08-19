@@ -60,14 +60,14 @@ Installation
     <pre>
     autocmd FileType ruby,erb call AddRubyNextFiles()
     function! AddRubyNextFiles()
-    let g:nextFiles = {}
-    call AddNextFile("\\(\/.*\\)\/app\/models\/\\(.*\\).rb", "\\1\/test\/unit\/\\2_test.rb",
+      let g:nextFiles = {}
+      call AddNextFile("\\(\/.*\\)\/app\/models\/\\(.*\\).rb", "\\1\/test\/unit\/\\2_test.rb",
         \ "/home/me/myproject/app/models/foo.rb", "/home/me/myproject/test/unit/foo_test.rb")
-    call AddNextFile("\\(\/.*\\)\/test\/unit\/\\(.*\\)_test.rb", "\\1\/app\/models\/\\2.rb", 
+      call AddNextFile("\\(\/.*\\)\/test\/unit\/\\(.*\\)_test.rb", "\\1\/app\/models\/\\2.rb", 
         \ "/home/me/myproject/test/unit/foo_test.rb", "/home/me/myproject/app/models/foo.rb")
-    call AddNextFile("\\(\/.*\\)\/app\/controllers\/\\(.*\\).rb", "\\1\/test\/functional\/\\2_test.rb",
+      call AddNextFile("\\(\/.*\\)\/app\/controllers\/\\(.*\\).rb", "\\1\/test\/functional\/\\2_test.rb",
         \ "/home/me/myproject/app/controllers/foos_controller.rb", "/home/me/myproject/test/functional/foos_controller_test.rb")
-    call AddNextFile("\\(\/.*\\)\/test\/functional\/\\(.*\\)_test.rb", "\\1\/app\/controllers\/\\2.rb",
+      call AddNextFile("\\(\/.*\\)\/test\/functional\/\\(.*\\)_test.rb", "\\1\/app\/controllers\/\\2.rb",
         \ "/home/me/myproject/test/functional/foos_controller_test.rb", "/home/me/myproject/app/controllers/foos_controller.rb")
     endfunction
     </pre>
