@@ -1,21 +1,17 @@
-" nextfiles.vim - browse related files and open a file
+" nextfile.vim - browse related files and open a file
 " Maintainer:  Allen Kim <bighostkim@gmail.com>
-" License: MIT license
-" Version:      0.1
-"
-" Install in ~/.vim/plugin/nextfile.vim
-"
-" TODO: add help
-" TODO: example for file types (ruby, js)
+" License:     MIT license
+" Version:     0.1
 
 " Do not load this plugin if is has already been loaded.
-if exists("g:nextFiles")
+if exists("g:loadedNextFile")
   finish
 endif
+let g:loadedNextFile = 0.1  " version number
 
-let g:loadedNextFiles = 0.1  " version number
-if !exists("g:nextFilesMap") " User can add more groups
-  let g:nextFilesMap = {
+" TODO: this can be done by file types
+if !exists("g:relatedFiles") " User can add more groups
+  let g:relatedFiles = {
     \ "Ruby On Rails" : {
       \ "Controller" : { "expression" : "app/controllers/(.*)_controller.rb$", "transform" : "pluralize" },
       \ "Funtional Test" : { "expression" : "test/functional/(.*)_controller_test.rb$", "transform" : "pluralize" },
@@ -32,14 +28,14 @@ let s:scriptDirectory = expand('<sfile>:p:h') " current script directory path
 " Purpose  : Lists the related file by checking the current file path 
 " Args     : none
 " Returns  : none
-function! NextFiles() 
+function! NextFile() 
   let currentFile = expand("%:p")
-  let nextFiles = s:GetNextFiles(currentFile)
-  if empty(nextFiles)
-    call s:Warn("Could not find matching related files from nextFiles, :echo nextFiles")
+  let relatedFiles = s:GetRelatedFiles(currentFile)
+  if empty(relatedFiles)
+    call s:Warn("Could not find matching related files from relatedFiles, :echo relatedFiles")
     return
   else
-    call s:OpenWindow(nextFiles)
+    call s:OpenWindow(relatedFiles)
   endif
 endfunction
 
@@ -55,32 +51,32 @@ function! s:Warn(msg)
 endfunction
 
 " ------------------------------------------------------------------------------
-" Function : GetNextFiles (PRIVATE)
+" Function : GetRelatedFiles (PRIVATE)
 " Purpose  : To list related files from the current file path
 " Args     : Current file path
 " Returns  : list of files in dictionary
-function! s:GetNextFiles(currentFilePath)
+function! s:GetRelatedFiles(currentFilePath)
   let [groupName, expr] = s:GetFileGroup(a:currentFilePath)
   let expr = substitute(expr, '\v\$$', '', 'g') " remove traling dollar($) sign
-  let nextFiles = {}
+  let relatedFiles = {}
   if groupName != ""
     let word = matchlist(a:currentFilePath, '\v'.expr)[1]
     let relativePath = substitute(expr, '(.*)', word, '') 
     let pos = match(a:currentFilePath, '\v'.relativePath) - 1
     let absoluteAffix = a:currentFilePath[:pos]
-    for [key, dict] in items(g:nextFilesMap[groupName])
+    for [key, dict] in items(g:relatedFiles[groupName])
       let replExpr = substitute(dict["expression"], '\v\$$', '', 'g')
       if dict["transform"] == "singularize"
-        let nextFiles[key] = absoluteAffix.substitute(replExpr, '(.*)', s:Singularize(word), '') 
+        let relatedFiles[key] = absoluteAffix.substitute(replExpr, '(.*)', s:Singularize(word), '') 
       elseif dict["transform"] == "pluralize"
       echo ["12", s:Pluralize(word)]
-        let nextFiles[key] = absoluteAffix.substitute(replExpr, '(.*)', s:Pluralize(word), '') 
+        let relatedFiles[key] = absoluteAffix.substitute(replExpr, '(.*)', s:Pluralize(word), '') 
       else
-        let nextFiles[key] = absoluteAffix.substitute(replExpr, '(.*)', word, '') 
+        let relatedFiles[key] = absoluteAffix.substitute(replExpr, '(.*)', word, '') 
       end
     endfor
   endif
-  return nextFiles
+  return relatedFiles
 endfunction
 
 " ------------------------------------------------------------------------------
@@ -89,7 +85,7 @@ endfunction
 " Args     : Current file path
 " Returns  : group name, regular expression
 function! s:GetFileGroup(currentFilePath)
-  for [groupName, filesDict] in items(g:nextFilesMap)
+  for [groupName, filesDict] in items(g:relatedFiles)
     for [key, dict] in items(filesDict)
       if a:currentFilePath =~? '\v'.dict["expression"]
         return [groupName, dict["expression"]]
