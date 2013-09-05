@@ -24,8 +24,8 @@ Installation
 * To your ~/.vimrc, add a keyboard map to call NextFiles() function
 
 <pre>
-    imap <Leader>n <ESC>:call NextFiles()<CR>
-    nmap <Leader>n <ESC>:call NextFiles()<CR>
+    imap &lt;Leader>n &lt;ESC>:call NextFiles()&lt;CR>
+    nmap &lt;Leader>n &lt;ESC>:call NextFiles()&l6;CR>
 </pre>
 
 * For Rails developers, there is pre-defined mapping like the following. You may want to change this. If so, you can re-define this in your .vimrc
