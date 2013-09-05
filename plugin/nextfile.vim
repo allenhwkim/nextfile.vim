@@ -32,7 +32,7 @@ function! NextFile()
   let currentFile = expand("%:p")
   let relatedFiles = s:GetRelatedFiles(currentFile)
   if empty(relatedFiles)
-    call s:Warn("Could not find matching related files from relatedFiles, :echo relatedFiles")
+    call s:Warn("Could not find definition of matching related files. For details :echo relatedFiles")
     return
   else
     call s:OpenWindow(relatedFiles)
