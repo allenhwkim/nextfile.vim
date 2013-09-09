@@ -171,6 +171,7 @@ function! s:OpenWindow(dict)
 
     " If the window is already open, jump to it
     let winnum = bufwinnr(bname)
+    let maxNumLines = max(len(dict), 15)
     if winnum != -1
       if winnr() != winnum  " If not already in the window, jump to it
         exe winnum . 'wincmd w'
@@ -188,7 +189,7 @@ function! s:OpenWindow(dict)
         let wcmd = '+buffer' . bufnum
       endif
 
-      exe 'silent! botright 10split '.wcmd
+      exe 'silent! botright '.maxNumLines.'split '.wcmd
     endif
 
     " Mark the buffer as scratch
