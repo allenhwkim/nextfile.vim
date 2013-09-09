@@ -3,13 +3,13 @@ nextfiles.vim
 
 Vim script to open related files by command, or by keymap(i.e. \n or any)
 
-![Screen Shot](http://i.imgur.com/wrrA8Tj.png)
+![Screen Shot](http://i.imgur.com/TsAq70K.png)
 
 How it works
 ------------
 
 * When initialized, set related files
-* In vim window, when <leader>n is pressed
+* In vim window, when NextFile() is called, by key mapping, <leader>n, is pressed
 
   * Get the current file name
   * Get the related files
