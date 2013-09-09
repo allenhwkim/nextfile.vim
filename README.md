@@ -3,6 +3,8 @@ nextfiles.vim
 
 Vim script to open related files by command, or by keymap(i.e. \n or any)
 
+![Screen Shot](http://i.imgur.com/wrrA8Tj.png)
+
 How it works
 ------------
 
