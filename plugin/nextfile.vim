@@ -15,7 +15,7 @@ if !exists("g:relatedFiles") " User can add more groups
     \ "Ruby On Rails" : {
       \ "Controller" : { "expression" : "app/controllers/(.*)_controller.rb$", "transform" : "pluralize" },
       \ "Funtional Test" : { "expression" : "test/functional/(.*)_controller_test.rb$", "transform" : "pluralize" },
-      \ "View" : { "expression" : "app/view/(.*)/", "transform" : "pluralize" },
+      \ "View" : { "expression" : "app/views/(.*)/", "transform" : "pluralize" },
       \ "Model" : { "expression" : "app/models/(.*).rb$", "transform" : "singularize" },
       \ "Unit Test" : { "expression" : "test/unit/(.*)_test.rb$", "transform" : "singularize" }
     \ }
