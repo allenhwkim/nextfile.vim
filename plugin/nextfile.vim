@@ -1,7 +1,7 @@
 " nextfile.vim - browse related files and open a file
 " Maintainer:  Allen Kim <bighostkim@gmail.com>
 " License:     MIT license
-" Version:     0.1
+" Version:     0.3
 
 " Do not load this plugin if is has already been loaded.
 if exists("g:loadedNextFile")
@@ -67,16 +67,31 @@ function! s:GetRelatedFiles(currentFilePath)
     for [key, dict] in items(g:relatedFiles[groupName])
       let replExpr = substitute(dict["expression"], '\v\$$', '', 'g')
       if dict["transform"] == "singularize"
-        let relatedFiles[key] = absoluteAffix.substitute(replExpr, '(.*)', s:Singularize(word), '') 
+        let relatedFiles[key] = [replExpr, absoluteAffix.substitute(replExpr, '(.*)', s:Singularize(word), '')] 
       elseif dict["transform"] == "pluralize"
-      echo ["12", s:Pluralize(word)]
-        let relatedFiles[key] = absoluteAffix.substitute(replExpr, '(.*)', s:Pluralize(word), '') 
+        let relatedFiles[key] = [replExpr, absoluteAffix.substitute(replExpr, '(.*)', s:Pluralize(word), '')]
       else
-        let relatedFiles[key] = absoluteAffix.substitute(replExpr, '(.*)', word, '') 
+        let relatedFiles[key] = [replExpr, absoluteAffix.substitute(replExpr, '(.*)', word, '')]
       end
     endfor
   endif
-  return relatedFiles
+  let fileList = []
+  let pos = 0
+  let currentFilePos = 0
+  for [name, val] in items(relatedFiles)
+    let [expr, path] = val
+    if a:currentFilePath =~? '\v'.expr  " if expression matches to the current file
+      let currentFilePos =  pos
+    endif
+    call add(fileList, name." (".path.")")
+    let pos += 1
+  endfor
+  if (currentFilePos + 1) != len(fileList)  " if current file not last positioned
+    " change the array to have the current file last positioned
+    " i.e.  [c,1,2,3] to [1,2,3,c], [1,c,2,3] to [2,3,1,c]
+    let fileList = fileList[(currentFilePos+1):] + fileList[:currentFilePos] 
+  endif
+  return fileList
 endfunction
 
 " ------------------------------------------------------------------------------
@@ -163,7 +178,7 @@ endfunction
 "
 " Thanks fot MRU, majority of the following code is copy/pasted from mru.vim
 "
-function! s:OpenWindow(dict)
+function! s:OpenWindow(files)
     " Save the current buffer number. This is used later to open a file when a entry is selected from the temporary window.
     let s:lastBuffer = bufnr('%')
 
@@ -171,7 +186,8 @@ function! s:OpenWindow(dict)
 
     " If the window is already open, jump to it
     let winnum = bufwinnr(bname)
-    let maxNumLines = max(len(dict), 15)
+    " set number of lines of the window to be max 15 or number of files and comment
+    let maxNumLines = min([len(a:files) + 1, 15])
     if winnum != -1
       if winnr() != winnum  " If not already in the window, jump to it
         exe winnum . 'wincmd w'
@@ -211,18 +227,17 @@ function! s:OpenWindow(dict)
     vnoremap <buffer> <silent> o :call <SID>OpenFile('split')<CR>
     nnoremap <buffer> <silent> O :call <SID>OpenFile('vsplit')<CR>
     vnoremap <buffer> <silent> O :call <SID>OpenFile('vsplit')<CR>
+    nnoremap <buffer> <silent> v :call <SID>OpenFile('vsplit')<CR>
+    vnoremap <buffer> <silent> v :call <SID>OpenFile('vsplit')<CR>
     nnoremap <buffer> <silent> q :close<CR>
 
     " Restore the previous cpoptions settings
     let &cpoptions = old_cpoptions
 
     " Display the file list
-    let files = []
-    for [name, path] in items(a:dict)
-      call add(files, name." (".path.")")
-    endfor
+    let lines = ["\"\"\" options: <CR> to open file, 'o'(split), 'v'(vsplit) "] + a:files
 
-    let m = copy(files)   " shallw copy of file list
+    let m = copy(lines)   " shallw copy of file list
     silent! 0put =m       " put the files from the top of the document
     $delete               " Delete the empty line at the end of the buffer
     normal! gg            " Move the cursor to the beginning of the file
@@ -237,6 +252,9 @@ endfunction
 function! s:OpenFile(openType) range
 
   let lineStr = getline(".")                   " string of current line
+  if lineStr =~ '"""'                          " if comment line, do nothing
+    return 
+  endif
   let fname = matchstr(lineStr, '(\zs.*\ze)')  " get file name between ( and )
   let escFname = escape(fname, ' *?[{`$%#"|!<>();&' . "'\t\n") " special character escaped file name
 
