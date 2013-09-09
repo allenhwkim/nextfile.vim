@@ -24,10 +24,13 @@ Installation
   * plural_expressions.txt
 
 * To your ~/.vimrc, add a keyboard map to call NextFiles() function
-
+  * The following is my preference. \r to see related files
 <pre>
-    imap &lt;Leader>n &lt;ESC>:call NextFiles()&lt;CR>
-    nmap &lt;Leader>n &lt;ESC>:call NextFiles()&l6;CR>
+    nmap &lt;Leader>r &lt;ESC>:call NextFile()&l6;CR>
+</pre>
+  Or, you may assign \n to see next file on the cursor
+<pre>
+    nmap &lt;Leader>n &lt;ESC>:call NextFile()&l6;CR>
 </pre>
 
 * For Rails developers, there is pre-defined mapping like the following. You may want to change this. If so, you can re-define this in your .vimrc

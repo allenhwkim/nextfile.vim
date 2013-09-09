@@ -241,6 +241,7 @@ function! s:OpenWindow(files)
     silent! 0put =m       " put the files from the top of the document
     $delete               " Delete the empty line at the end of the buffer
     normal! gg            " Move the cursor to the beginning of the file
+    normal! j             " Move to the next line
     setlocal nomodifiable " not for edit
 endfunction
 
