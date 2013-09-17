@@ -3,7 +3,7 @@ nextfile.vim
 
 Vim script to open related files by command, or by keymap(i.e. \n or any)
 
-![Screen Shot](http://i.imgur.com/TsAq70K.png)
+![Screen Shot](http://i.imgur.com/tQMYsBA.png)
 
 How it works
 ------------
@@ -14,6 +14,14 @@ How it works
   * Get the current file name
   * Get the related files
   * Browse the related files and open in current, splitted, or vertically splitted window
+
+Usage
+-------
+  * \r to open related files
+  * &lt;Enter> to open a file
+  * `o` to open in a split window
+  * `v` to open in a vertically split window
+  * NEW!! &lt;Enter> on directory will list files in the directory
 
 Installation
 ------------
