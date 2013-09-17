@@ -1,19 +1,27 @@
-nextfiles.vim
+nextfile.vim
 =============
 
 Vim script to open related files by command, or by keymap(i.e. \n or any)
 
-![Screen Shot](http://i.imgur.com/wrrA8Tj.png)
+![Screen Shot](http://i.imgur.com/tQMYsBA.png)
 
 How it works
 ------------
 
 * When initialized, set related files
-* In vim window, when <leader>n is pressed
+* In vim window, when NextFile() is called, by key mapping, <leader>n, is pressed
 
   * Get the current file name
   * Get the related files
   * Browse the related files and open in current, splitted, or vertically splitted window
+
+Usage
+-------
+  * \r to open related files
+  * &lt;Enter> to open a file
+  * `o` to open in a split window
+  * `v` to open in a vertically split window
+  * NEW!! &lt;Enter> on directory will list files in the directory
 
 Installation
 ------------
