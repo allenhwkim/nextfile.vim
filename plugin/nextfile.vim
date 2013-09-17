@@ -1,11 +1,11 @@
 " nextfile.vim - browse related files and open a file
 " Maintainer:  Allen Kim <bighostkim@gmail.com>
 " License:     MIT license
-" Version:     0.3
+" Version:     0.4
 
 " Do not load this plugin if is has already been loaded.
 if exists("g:loadedNextFile")
-  finish
+"  finish
 endif
 let g:loadedNextFile = 0.1  " version number
 
@@ -32,7 +32,7 @@ function! NextFile()
   let currentFile = expand("%:p")
   let relatedFiles = s:GetRelatedFiles(currentFile)
   if empty(relatedFiles)
-    call s:Warn("Could not find definition of matching related files. For details :echo relatedFiles")
+    call s:Warn("Could not find definition of matching related files. For detail).'k' :echo relatedFiles")
     return
   else
     call s:OpenWindow(relatedFiles)
@@ -205,7 +205,8 @@ function! s:OpenWindow(files)
         let wcmd = '+buffer' . bufnum
       endif
 
-      exe 'silent! botright '.maxNumLines.'split '.wcmd
+      "exe 'silent! botright '.maxNumLines.'split '.wcmd
+      exe 'silent! botright 15split '.wcmd
     endif
 
     " Mark the buffer as scratch
@@ -215,6 +216,12 @@ function! s:OpenWindow(files)
     setlocal nowrap
     setlocal nobuflisted
     setlocal winfixheight
+
+    " set syntax highlighting for full path (trying to hide)
+    hi Normal   guifg=lightgrey guibg=black ctermfg=lightgray ctermbg=black
+    hi Hidden   guifg=black ctermfg=black
+    hi link FilePath Hidden
+    syntax region FilePath start=/((/ skip=/\v\\./ end=/))/
 
     " Setup the cpoptions properly for the maps to work
     let old_cpoptions = &cpoptions
@@ -251,46 +258,83 @@ endfunction
 " Args     : openType, how to open a file, split, vsplit, or edit
 " Returns  : None
 function! s:OpenFile(openType) range
-
   let lineStr = getline(".")                   " string of current line
   if lineStr =~ '"""'                          " if comment line, do nothing
     return 
   endif
-  let fname = matchstr(lineStr, '(\zs.*\ze)')  " get file name between ( and )
-  let escFname = escape(fname, ' *?[{`$%#"|!<>();&' . "'\t\n") " special character escaped file name
+  if lineStr =~ '((\(.*\)))'                   " get file path
+    let fileName = matchlist(lineStr, '((\(.*\)))')[1] 
+  else
+    let fileName = matchlist(lineStr, '(\(.*\))')[1] 
+  endif
+  let escFname = escape(fileName, ' *?[{`$%#"|!<>();&' . "'\t\n") " special character escaped file name
 
-  " close this window since it is invoked by key map from the temporary window
-  " this has to be done AFTER you get the contents of current line
-  silent! close  
+  if escFname =~ '\v\/$'                       " ends with /, a directory
+    call s:ToggleDirectory(escFname)
+  else
+    " close this window since it is invoked by key map from the temporary window
+    " this has to be done AFTER you get the contents of current line
+    silent! close  
 
-  if a:openType == 'split'    " Edit the file in a new horizontally split window above the previous window
-    wincmd p
-    exe 'belowright new ' . escFname
-  elseif a:openType == 'vsplit' " Edit the file in a new vertically split window above the previous window
-    wincmd p
-    exe 'belowright vnew ' . escFname
-  elseif a:openType == 'edit'
-    let winnum = bufwinnr('^' . escFname . '$')
-    if winnum != -1  " If the selected file is already open in one of the windows, jump to it
-      exe winnum . 'wincmd w'
-    else             " use the previous window
-      wincmd p 
+    if a:openType == 'split'    " Edit the file in a new horizontally split window above the previous window
+      wincmd p
+      exe 'belowright new ' . escFname
+    elseif a:openType == 'vsplit' " Edit the file in a new vertically split window above the previous window
+      wincmd p
+      exe 'belowright vnew ' . escFname
+    elseif a:openType == 'edit'
+      let winnum = bufwinnr('^' . escFname . '$')
+      if winnum != -1  " If the selected file is already open in one of the windows, jump to it
+        exe winnum . 'wincmd w'
+      else             " use the previous window
+        wincmd p 
 
-      let split_window = 0
-      " open in a split window if;
-      " . current buffer is modified or is the preview window
-      " . current buffer is a special buffer (maybe used by a plugin)
-      if &modified || &previewwindow 
-        let split_window = 1 
-      elseif &buftype != '' && bufnr('%') != bufnr('__next_files__') 
-        let split_window = 1      
-      endif
+        let split_window = 0
+        " open in a split window if;
+        " . current buffer is modified or is the preview window
+        " . current buffer is a special buffer (maybe used by a plugin)
+        if &modified || &previewwindow 
+          let split_window = 1 
+        elseif &buftype != '' && bufnr('%') != bufnr('__next_files__') 
+          let split_window = 1      
+        endif
 
-      if split_window
-        exe 'split ' . escFname
-      else
-        exe 'edit ' . escFname
+        if split_window
+          exe 'split ' . escFname
+        else
+          exe 'edit ' . escFname
+        endif
       endif
     endif
-  endif
+  endif " if not a directory
 endfunction
+
+" ------------------------------------------------------------------------------
+" Function : ToggleDirectory(PRIVATE)
+" Purpose  : Open/Close a directory on the current(temporary) window
+" Returns  : None
+function! s:ToggleDirectory(dirName)
+  let lineStr = getline(".")                   " string of current line
+  let lineNum = line(".")                      " current line number to comback
+  let escDirName = escape(a:dirName, ' *?[{`$%#"|!<>();&' . "'\t\n") " special character escaped file name
+  let tabChar = matchstr(lineStr, '\v^\s+').'  '
+
+  let nxtLineStr = getline(lineNum+1)
+  setlocal modifiable
+  if nxtLineStr =~ '\v^'.tabChar    "directory opened status
+    normal! j
+    while getline(".") =~ '\v^'.tabChar
+      normal! dd
+    endwhile
+    normal! k
+  else
+    let files = split(system('ls -fdF '.a:dirName.'*'), '\n')
+    for file in files
+      put =tabChar.substitute(file, a:dirName, '', '').'      (('.file.'))'
+    endfor
+    call cursor(lineNum, len(tabChar))
+  end
+
+  setlocal nomodifiable
+endfunction
+
