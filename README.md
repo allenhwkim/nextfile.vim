@@ -44,7 +44,7 @@ Installation
 * For Rails developers, there is pre-defined mapping like the following. You may want to change this. If so, you can re-define this in your .vimrc
 
 <pre>
-    let g:g:relatedFiles = {
+    let g:relatedFiles = {
       \ "Ruby On Rails" : {
         \ "Controller" : { "expression" : "app/controllers/(.*)_controller.rb$", "transform" : "pluralize" },
         \ "Funtional Test" : { "expression" : "test/functional/(.*)_controller_test.rb$", "transform" : "pluralize" },
