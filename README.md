@@ -34,17 +34,17 @@ Installation
 * To your ~/.vimrc, add a keyboard map to call NextFiles() function
   * The following is my preference. \r to see related files
 <pre>
-    nmap &lt;Leader>r &lt;ESC>:call NextFile()&l6;CR>
+    nmap &lt;Leader>r &lt;ESC>:call NextFile()&lt;CR>
 </pre>
   Or, you may assign \n to see next file on the cursor
 <pre>
-    nmap &lt;Leader>n &lt;ESC>:call NextFile()&l6;CR>
+    nmap &lt;Leader>n &lt;ESC>:call NextFile()&lt;CR>
 </pre>
 
 * For Rails developers, there is pre-defined mapping like the following. You may want to change this. If so, you can re-define this in your .vimrc
 
 <pre>
-    let g:nextFilesMap["Ruby On Rails"] = {
+    let g:relatedFiles = {
       \ "Ruby On Rails" : {
         \ "Controller" : { "expression" : "app/controllers/(.*)_controller.rb$", "transform" : "pluralize" },
         \ "Funtional Test" : { "expression" : "test/functional/(.*)_controller_test.rb$", "transform" : "pluralize" },
